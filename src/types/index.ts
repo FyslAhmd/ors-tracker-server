@@ -1,4 +1,5 @@
-import { Request } from 'express';
+import { Request, ParamsDictionary } from 'express-serve-static-core';
+import { ParsedQs } from 'qs';
 
 // User Types
 export type UserRole = 'admin' | 'inspector' | 'viewer';
@@ -70,7 +71,12 @@ export interface IORSPlan {
 }
 
 // Request Types
-export interface AuthRequest extends Request {
+export interface AuthRequest<
+  P = ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = ParsedQs
+> extends Request<P, ResBody, ReqBody, ReqQuery> {
   user?: IUserResponse;
 }
 
