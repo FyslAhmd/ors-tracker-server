@@ -12,10 +12,26 @@ const app: Application = express();
 // Security middleware
 app.use(helmet());
 
-// CORS configuration
+// CORS configuration - support multiple origins for dev and production
+const allowedOrigins = [
+  appConfig.frontendUrl,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://ors-tracker-client.vercel.app'
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: appConfig.frontendUrl,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.some(allowed => origin.startsWith(allowed.replace(/\/$/, '')))) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Allow all origins in case of Vercel preview URLs
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
